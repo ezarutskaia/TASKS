@@ -30,7 +30,7 @@ type Task struct {
 	Priority string
 }
 
-func isStringExists(slice []string, w string) bool {
+func IsStringExists(slice []string, w string) bool {
 	for _, item := range slice {
 		if item == w {
 			return true
@@ -40,7 +40,7 @@ func isStringExists(slice []string, w string) bool {
 }
 
 func (m *Manager) CreateTask(name string) (*Task, error) {
-	if m.User.hasRole(3) == true {
+	if m.User.HasRole(3) == true {
 		return &Task{Id: 1, Name: name, UserId: m.User.Id}, nil
 	}
 	return &Task{}, errors.New("You don't have roles")
@@ -48,7 +48,7 @@ func (m *Manager) CreateTask(name string) (*Task, error) {
 }
 
 func (t *Task) setStatus(s string) (*Task, error) {
-	if isStringExists(ListStatus, s) == true {
+	if IsStringExists(ListStatus, s) == true {
 		t.Status = s
 		return t, nil
 	}
@@ -56,7 +56,7 @@ func (t *Task) setStatus(s string) (*Task, error) {
 }
 
 func (t *Task) setPriority(s string) (*Task, error) {
-	if isStringExists(ListPriority, s) == true {
+	if IsStringExists(ListPriority, s) == true {
 		t.Priority = s
 		return t, nil
 	}

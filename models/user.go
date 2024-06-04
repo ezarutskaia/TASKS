@@ -19,7 +19,7 @@ func (u User) validMail() bool {
 	return matched
 }
 
-func (u *User) hasRole(n int) bool {
+func (u *User) HasRole(n int) bool {
 	for _, item := range u.Roles {
 		if item.Value == n {
 			return true
@@ -29,7 +29,7 @@ func (u *User) hasRole(n int) bool {
 }
 
 func (u *User) isAdmin() bool {
-	return u.hasRole(7)
+	return u.HasRole(7)
 }
 
 func (u *User) AddRole(r Role) {
