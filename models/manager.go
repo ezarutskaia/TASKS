@@ -47,7 +47,7 @@ func (m *Manager) CreateTask(name string) (*Task, error) {
 
 }
 
-func (t *Task) setStatus(s string) (*Task, error) {
+func (t *Task) SetStatus(s string) (*Task, error) {
 	if IsStringExists(ListStatus, s) == true {
 		t.Status = s
 		return t, nil
@@ -55,7 +55,7 @@ func (t *Task) setStatus(s string) (*Task, error) {
 	return t, errors.New("wrong status")
 }
 
-func (t *Task) setPriority(s string) (*Task, error) {
+func (t *Task) SetPriority(s string) (*Task, error) {
 	if IsStringExists(ListPriority, s) == true {
 		t.Priority = s
 		return t, nil

@@ -2,6 +2,7 @@ package models
 
 import	(
 	"testing"
+	"errors"
 	"strconv"
 	"github.com/stretchr/testify/assert"
 )
@@ -17,20 +18,12 @@ func TestIsStringExists(t *testing.T) {
 	expected2 := false
 	actual2 := IsStringExists(slice, text2)
 
-	// if expected1 != actual1 {
-    // 	t.Errorf("Result was incorrect, got: %s, want: %s.", strconv.FormatBool(actual1), strconv.FormatBool(expected1))
-	// }
-	// if expected2 != actual2 {
-    // 	t.Errorf("Result was incorrect, got: %s, want: %s.", strconv.FormatBool(actual2), strconv.FormatBool(expected2))
-	// }
 	assert.Equal(t, strconv.FormatBool(expected1), strconv.FormatBool(actual1))
 	assert.Equal(t, strconv.FormatBool(expected2), strconv.FormatBool(actual2))
-
 }
 
 func TestCreateTask(t *testing.T) {
 	name := "testName"
-	//testRole := &Role{"Worker", 3}
 	testUser := &User{Email: "xyz@mail.com", Id: 3, Roles: []Role{Role{"Worker", 3},}}
 	testManager := &Manager{User: *testUser, AccesLevel: 3}
 	expected := &Task{Id: 1, Name: "testName", UserId: 3}
@@ -40,3 +33,21 @@ func TestCreateTask(t *testing.T) {
 	assert.Equal(t, expected, actual)
 }
 
+func TestSetStatus(t *testing.T) {
+	testTask := &Task{Id: 1, Name: "testName", UserId: 3}
+	testStatus := "in progress"
+	expected := &Task{Id: 1, Name: "testName", UserId: 3, Status: "in progress"}
+	actual, err := testTask.SetStatus(testStatus)
+
+	assert.Nil(t, err)
+	assert.Equal(t, expected, actual)
+}
+
+func TestSetPriority(t *testing.T) {
+	testTask := &Task{Id: 1, Name: "testName", UserId: 3}
+	testPriority := "ok"
+	expected := errors.New("wrong ptiority")
+	_, err := testTask.SetPriority(testPriority)
+
+	assert.Equal(t, expected, err)
+}
