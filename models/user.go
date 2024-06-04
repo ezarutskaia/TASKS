@@ -13,7 +13,7 @@ type Role struct {
 	Value int
 }
 
-func (u User) validMail() bool {
+func (u User) ValidMail() bool {
 	const emailRegexPattern = `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
 	matched, _ := regexp.MatchString(emailRegexPattern, u.Email)
 	return matched
@@ -28,7 +28,7 @@ func (u *User) HasRole(n int) bool {
 	return false
 }
 
-func (u *User) isAdmin() bool {
+func (u *User) IsAdmin() bool {
 	return u.HasRole(7)
 }
 
