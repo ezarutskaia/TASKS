@@ -27,8 +27,8 @@ func main() {
 		models.Task{Id: 5, Name: "F", UserId: 2, Status: models.Open, Priority: models.Critical},
 	}
 	filters := []models.TaskFilter{
-		models.TaskFilter{Type: "status", Value: models.Open},
-		models.TaskFilter{Type: "priority", Value: models.Critical},
+		models.TaskFilter{Type: models.FilterStatus, Value: models.Open},
+		models.TaskFilter{Type: models.FilterPriority, Value: models.Critical},
 	}
 	filtertasks := models.FilterTaskSlice(tasks, filters)
 
