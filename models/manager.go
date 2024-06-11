@@ -1,6 +1,9 @@
 package models
 
-import	"errors"
+import	(
+	"errors"
+	"gorm.io/gorm"
+)
 
 const (
 	Open       = "open"
@@ -18,12 +21,14 @@ var ListStatus = []string{Open, InProgress, Done, Closed}
 var ListPriority = []string{Low, Normal, High, Critical}
 
 type Manager struct {
-	User User
+	gorm.Model
+	User User `gorm:"foreignKey:Id"`
 	AccesLevel int
 }
 
 type Task struct {
-	Id       int
+	gorm.Model
+	Id       int `gorm:"primaryKey"`
 	Name     string
 	UserId   int
 	Status   string

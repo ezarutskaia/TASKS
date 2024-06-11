@@ -1,14 +1,19 @@
 package models
 
-import "regexp"
+import (
+	"regexp"
+	"gorm.io/gorm"
+)
 
 type User struct {
-	Email string
-	Id    int
+	gorm.Model
+	Id    int `gorm:"primaryKey"`
+	Email string `gorm:"unique"`
 	Roles []Role
 }
 
 type Role struct {
+	gorm.Model
 	Name  string
 	Value int
 }
