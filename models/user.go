@@ -7,13 +7,15 @@ import (
 
 type User struct {
 	gorm.Model
-	Id    int `gorm:"primaryKey"`
+	Id    int
 	Email string `gorm:"unique"`
-	Roles []Role
+	Roles []Role `gorm:"many2many:user_roles;"`
+	Tasks []Task `gorm:"many2many:user_tasks;"`
 }
 
 type Role struct {
 	gorm.Model
+	Id int
 	Name  string
 	Value int
 }

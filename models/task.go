@@ -20,17 +20,11 @@ const (
 var ListStatus = []string{Open, InProgress, Done, Closed}
 var ListPriority = []string{Low, Normal, High, Critical}
 
-type Manager struct {
-	gorm.Model
-	User User `gorm:"foreignKey:Id"`
-	AccesLevel int
-}
-
 type Task struct {
 	gorm.Model
 	Id       int `gorm:"primaryKey"`
 	Name     string
-	UserId   int
+	UserID   int
 	Status   string
 	Priority string
 }
@@ -44,9 +38,9 @@ func IsStringExists(slice []string, w string) bool {
 	return false
 }
 
-func (m *Manager) CreateTask(name string) (*Task, error) {
-	if m.User.HasRole(3) == true {
-		return &Task{Id: 1, Name: name, UserId: m.User.Id}, nil
+func (u *User) CreateTask(name string) (*Task, error) {
+	if u.HasRole(3) == true {
+		return &Task{Id: 1, Name: name, UserID: u.Id}, nil
 	}
 	return &Task{}, errors.New("You don't have roles")
 

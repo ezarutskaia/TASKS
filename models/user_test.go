@@ -19,7 +19,7 @@ func TestValidMail(t *testing.T) {
 }
 
 func TestHasRole(t *testing.T) {
-	testUser := &User{Email: "xyz@mail.com", Id: 3, Roles: []Role{Role{"Worker", 3},}}
+	testUser := &User{Email: "xyz@mail.com", Id: 3, Roles: []Role{Role{Id: 1, Name:"Worker", Value: 3},}}
 	n := 3
 	expected := true
 	actual := testUser.HasRole(n)
@@ -28,7 +28,7 @@ func TestHasRole(t *testing.T) {
 }
 
 func TestIsAdmin(t *testing.T) {
-	testUser := &User{Email: "xyz@mail.com", Id: 3, Roles: []Role{Role{"Worker", 3},}}
+	testUser := &User{Email: "xyz@mail.com", Id: 3, Roles: []Role{Role{Id: 1, Name:"Worker", Value: 3},}}
 	expected := false
 	actual := testUser.IsAdmin()
 
@@ -36,18 +36,18 @@ func TestIsAdmin(t *testing.T) {
 }
 
 func TestAddRole(t *testing.T) {
-	testUser := &User{Email: "xyz@mail.com", Id: 3, Roles: []Role{Role{"Worker", 3},}}
-	testRole := Role{"Admin", 7}
-	expected := &User{Email: "xyz@mail.com", Id: 3, Roles: []Role{Role{"Worker", 3}, Role{"Admin", 7},}}
+	testUser := &User{Email: "xyz@mail.com", Id: 3, Roles: []Role{Role{Id: 1, Name:"Worker", Value: 3},}}
+	testRole := Role{Id: 2, Name:"Admin", Value:7}
+	expected := &User{Email: "xyz@mail.com", Id: 3, Roles: []Role{Role{Id: 1, Name:"Worker", Value: 3}, Role{Id: 2, Name:"Admin", Value:7},}}
 	testUser.AddRole(testRole)
 
 	assert.Equal(t, expected, testUser)
 }
 
 func TestRevokeRole(t *testing.T) {
-	testUser := &User{Email: "xyz@mail.com", Id: 3, Roles: []Role{Role{"Worker", 3}, Role{"Admin", 7},}}
-	testRole := Role{"Admin", 7}
-	expected := &User{Email: "xyz@mail.com", Id: 3, Roles: []Role{Role{"Worker", 3},}}
+	testUser := &User{Email: "xyz@mail.com", Id: 3, Roles: []Role{Role{Id: 1, Name:"Worker", Value: 3}, Role{Id: 2, Name:"Admin", Value:7},}}
+	testRole := Role{Id: 2, Name:"Admin", Value:7}
+	expected := &User{Email: "xyz@mail.com", Id: 3, Roles: []Role{Role{Id: 1, Name:"Worker", Value: 3},}}
 	testUser.RevokeRole(testRole)
 
 	assert.Equal(t, expected, testUser)

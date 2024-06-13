@@ -24,10 +24,9 @@ func TestIsStringExists(t *testing.T) {
 
 func TestCreateTask(t *testing.T) {
 	name := "testName"
-	testUser := &User{Email: "xyz@mail.com", Id: 3, Roles: []Role{Role{"Worker", 3},}}
-	testManager := &Manager{User: *testUser, AccesLevel: 3}
+	testUser := &User{Email: "xyz@mail.com", Id: 3, Roles: []Role{Role{Id: 1, Name:"Worker", Value: 3},}}
 	expected := &Task{Id: 1, Name: "testName", UserId: 3}
-	actual, err := testManager.CreateTask(name)
+	actual, err := testUser.CreateTask(name)
 
 	assert.Nil(t, err)
 	assert.Equal(t, expected, actual)
