@@ -10,7 +10,7 @@ type User struct {
 	Id    int
 	Email string `gorm:"unique"`
 	Roles []Role `gorm:"many2many:user_roles;"`
-	Tasks []Task `gorm:"many2many:user_tasks;"`
+	Tasks []Task
 }
 
 type Role struct {
