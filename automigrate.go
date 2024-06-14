@@ -8,7 +8,7 @@ import (
 func main() {
 	DataBase := *utils.Engine()
 
-	DataBase.AutoMigrate(&models.Role{})
+	//DataBase.AutoMigrate(&models.Role{})
 	DataBase.AutoMigrate(&models.User{})
-	DataBase.AutoMigrate(&models.Task{})
+	//DataBase.AutoMigrate(&models.Task{})
 }
