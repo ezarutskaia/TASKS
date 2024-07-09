@@ -39,7 +39,7 @@ func IsStringExists(slice []string, w string) bool {
 }
 
 func (u *User) CreateTask(name string) (*Task, error) {
-	if  u.HasRole(6) == true { 
+	if  u.HasRole(3) == true { 
 		return &Task{Name: name, UserID: u.Id}, nil
 	}
 	return &Task{}, errors.New("You don't have roles")
