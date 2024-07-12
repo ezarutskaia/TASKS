@@ -21,8 +21,9 @@ func main() {
     db := *utils.Engine()
 
     email := "xyz@mail.com"
-    uuid := "a9bd74b3-c427-4291-a6e9-b09cb986d43c"
-    check := auth.IsSession(email, uuid)
+    uuid := "79fb3589-5f11-4ce1-af8b-58be522b7290"
+   tocken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Inh5ekBtYWlsLmNvbSJ9.Ee7O9cwe7wBFizHY1hvAN0wJBj9PH2m6MIGx6trsncQ"
+    check := auth.IsSession(email, uuid, tocken)
 
     if check == true {
         var user models.User
@@ -31,7 +32,7 @@ func main() {
         if result.Error != nil {
             log.Fatal(result.Error)
         }
-        task, err := user.CreateTask("TestSeven")
+        task, err := user.CreateTask("TestNine")
         result = db.Create(task)
         if result.Error != nil {
             log.Fatal(result.Error)
