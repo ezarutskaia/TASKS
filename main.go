@@ -1,43 +1,31 @@
 package main
 
 import (
-	"fmt"
     "log"
-    "tasks/utils"
+    "net/http"
     "tasks/models"
     "tasks/auth"
+    "encoding/json"
 )
 
-// func main() {
+func UserValidation(w http.ResponseWriter, r *http.Request) {
+    var user models.User
+    if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+        http.Error(w, err.Error(), http.StatusBadRequest)
+        return
+    }
 
-// 	email := "xyz@mail.com"
-//     password := "password_for_xyz@mail.com"
+    tocken, _ := auth.CreateSession(user.Email, user.Password)
 
-//     auth.CreateSession(email, password)
-
-// }
+	w.Write([]byte(tocken))
+}
 
 func main() {
-    db := *utils.Engine()
 
-    email := "xyz@mail.com"
-    uuid := "79fb3589-5f11-4ce1-af8b-58be522b7290"
-   tocken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Inh5ekBtYWlsLmNvbSJ9.Ee7O9cwe7wBFizHY1hvAN0wJBj9PH2m6MIGx6trsncQ"
-    check := auth.IsSession(email, uuid, tocken)
+	mux := http.NewServeMux()
+    mux.HandleFunc("/login", UserValidation)
 
-    if check == true {
-        var user models.User
-
-        result := db.Preload("Roles").Where("email = ?", email).First(&user)
-        if result.Error != nil {
-            log.Fatal(result.Error)
-        }
-        task, err := user.CreateTask("TestNine")
-        result = db.Create(task)
-        if result.Error != nil {
-            log.Fatal(result.Error)
-        }
-        fmt.Println(task, err)
-    }
+	err := http.ListenAndServe(":4000", mux)
+    log.Fatal(err)
 
 }

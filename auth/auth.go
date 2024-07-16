@@ -33,7 +33,7 @@ func GenerateJWT(email string) (string, error) {
 	return tokenString, nil
 }
 
-func CreateSession(email string, password string) (*models.Session, error){
+func CreateSession(email string, password string) (string, error){
     db := *utils.Engine()
 	var user models.User
     now := time.Now()
@@ -51,13 +51,12 @@ func CreateSession(email string, password string) (*models.Session, error){
         session := &models.Session{Email: email, Uuid: uuid.New().String(), Endsession: now.Add(time.Hour)}
         result := db.Create(session)
         tocken, _ := GenerateJWT(email)
-        fmt.Println(tocken)
         if result.Error != nil {
             log.Fatal(result.Error)
         }
-        return session, nil
+        return tocken, nil
     } else {
-        return &models.Session{}, errors.New("User haven't got this password")
+        return "", errors.New("User haven't got this password")
     }
 }
 
