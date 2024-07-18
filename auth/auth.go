@@ -60,11 +60,11 @@ func CreateSession(email string, password string) (string, error){
     }
 }
 
-func IsSession (email string, uuid string, tocken string) bool {
+func IsSession (email string, token string) bool {
     db := *utils.Engine()
 	var session models.Session
 
-    result := db.Where("email = ? AND uuid = ? AND endsession > NOW()", email, uuid).First(&session)
+    result := db.Where("email = ? AND endsession > NOW()", email).Last(&session)
     if result.Error != nil {
         if result.Error == gorm.ErrRecordNotFound {
             return false
@@ -73,8 +73,8 @@ func IsSession (email string, uuid string, tocken string) bool {
         }
     }
 
-    ValidTocken, _ := GenerateJWT(email)
-    if tocken == ValidTocken {
+    ValidToken, _ := GenerateJWT(email)
+    if token == ValidToken {
         return true
     }
     return false 

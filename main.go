@@ -11,35 +11,42 @@ import (
 )
 
 func UserValidation(w http.ResponseWriter, r *http.Request) {
-    var user models.User
-    if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-        http.Error(w, err.Error(), http.StatusBadRequest)
-        return
-    }
+    emailHeader := r.Header.Get("email")
+	passwordHeader := r.Header.Get("password")
 
-    tocken, _ := auth.CreateSession(user.Email, user.Password)
+    if emailHeader == "" || passwordHeader == "" {
+		http.Error(w, "email or password not found", http.StatusBadRequest)
+		return
+	}
 
-	w.Write([]byte(tocken))
+    token, _ := auth.CreateSession(emailHeader, passwordHeader)
+
+	w.Write([]byte(token))
 }
 
-func SessionValidation(w http.ResponseWriter, r *http.Request) {
+func CreateNewTask(w http.ResponseWriter, r *http.Request) {
     db := *utils.Engine()
     var user models.User
     var requestData map[string]string
+    emailHeader := r.Header.Get("email")
+	tokenHeader := r.Header.Get("token")
+
+    if emailHeader == "" || tokenHeader == "" {
+		http.Error(w, "email or token not found", http.StatusBadRequest)
+		return
+	}
+
     if err := json.NewDecoder(r.Body).Decode(&requestData); err != nil {
         http.Error(w, err.Error(), http.StatusBadRequest)
         return
     }
 
-    email := requestData["email"]
-    uuid := requestData["uuid"]
-    token := requestData["token"]
     taskname := requestData["taskname"]
 
-    session := auth.IsSession(email, uuid, token)
+    session := auth.IsSession(emailHeader, tokenHeader)
 
     if session == true {
-        result := db.Preload("Roles").Where("email = ?", email).First(&user)
+        result := db.Preload("Roles").Where("email = ?", emailHeader).First(&user)
         if result.Error != nil {
             log.Fatal(result.Error)
         }
@@ -49,7 +56,7 @@ func SessionValidation(w http.ResponseWriter, r *http.Request) {
             log.Fatal(result.Error)
         }
 
-        w.Write([]byte("session was created with id " + strconv.Itoa(task.Id)))
+        w.Write([]byte("task was created with id " + strconv.Itoa(task.Id)))
     } else {
         w.Write([]byte("session is not exist"))
     }
@@ -59,7 +66,7 @@ func main() {
 
 	mux := http.NewServeMux()
     mux.HandleFunc("/login", UserValidation)
-    mux.HandleFunc("/task", SessionValidation)
+    mux.HandleFunc("/task", CreateNewTask)
 
 	err := http.ListenAndServe(":4000", mux)
     log.Fatal(err)
