@@ -11,6 +11,11 @@ import (
 )
 
 func UserValidation(w http.ResponseWriter, r *http.Request) {
+    if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
     emailHeader := r.Header.Get("email")
 	passwordHeader := r.Header.Get("password")
 
@@ -25,6 +30,11 @@ func UserValidation(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateNewTask(w http.ResponseWriter, r *http.Request) {
+    if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
     db := *utils.Engine()
     var user models.User
     var requestData map[string]string
@@ -62,11 +72,56 @@ func CreateNewTask(w http.ResponseWriter, r *http.Request) {
     }
 }
 
+func deleteTask(w http.ResponseWriter, r *http.Request) {
+    if r.Method != http.MethodDelete {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+    db := *utils.Engine()
+
+    queryParams := r.URL.Query()
+	id := queryParams.Get("id")
+	if id == "" {
+		http.Error(w, "Missing id parameter", http.StatusBadRequest)
+		return
+	}
+
+    emailHeader := r.Header.Get("email")
+	tokenHeader := r.Header.Get("token")
+
+    if emailHeader == "" || tokenHeader == "" {
+		http.Error(w, "email or token not found", http.StatusBadRequest)
+		return
+	}
+
+    session := auth.IsSession(emailHeader, tokenHeader)
+
+    if session == true {
+        result := db.Delete(&models.Task{}, id)
+
+        if result.Error != nil {
+            http.Error(w, "Database error: " + result.Error.Error(), http.StatusInternalServerError)
+            return
+        }
+
+        if result.RowsAffected == 0 {
+            http.Error(w, "No record found", http.StatusNotFound)
+            return
+        }
+
+        w.Write([]byte("task was delete with id " + id))
+    } else {
+        w.Write([]byte("session is not exist"))
+    }
+}
+
 func main() {
 
 	mux := http.NewServeMux()
     mux.HandleFunc("/login", UserValidation)
     mux.HandleFunc("/task", CreateNewTask)
+    mux.HandleFunc("/delete", deleteTask)
 
 	err := http.ListenAndServe(":4000", mux)
     log.Fatal(err)
