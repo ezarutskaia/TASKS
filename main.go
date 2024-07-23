@@ -24,7 +24,7 @@ func UserValidation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-    token, _ := auth.CreateSession(emailHeader, passwordHeader)
+    token, _ := auth.GetTokenSession(emailHeader, passwordHeader)
 
 	w.Write([]byte(token))
 }

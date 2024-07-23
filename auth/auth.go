@@ -1,14 +1,9 @@
 package auth
 
 import (
-    "log"
-    "fmt"
-    "time"
     "errors"
-	"tasks/models"
-	"tasks/utils"
-    "gorm.io/gorm"
-    "github.com/google/uuid"
+    "tasks/utils"
+    "tasks/database"
     "github.com/golang-jwt/jwt"
 )
 
@@ -29,31 +24,16 @@ func GenerateJWT(email string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
 	return tokenString, nil
 }
 
-func CreateSession(email string, password string) (string, error){
+func GetTokenSession(email string, password string) (string, error){
     db := *utils.Engine()
-	var user models.User
-    now := time.Now()
-
-    result := db.Where("email = ?", email).First(&user)
-    if result.Error != nil {
-        if result.Error == gorm.ErrRecordNotFound {
-            fmt.Printf("Пользователь с email %s не найден.\n", email)
-        } else {
-            log.Fatal(result.Error)
-        }
-    } 
+    user := database.GetUser(db, email)
 
     if user.Password == password {
-        session := &models.Session{Email: email, Uuid: uuid.New().String(), Endsession: now.Add(time.Hour)}
-        result := db.Create(session)
+        database.CreateSession(db, email)
         tocken, _ := GenerateJWT(email)
-        if result.Error != nil {
-            log.Fatal(result.Error)
-        }
         return tocken, nil
     } else {
         return "", errors.New("User haven't got this password")
@@ -62,20 +42,13 @@ func CreateSession(email string, password string) (string, error){
 
 func IsSession (email string, token string) bool {
     db := *utils.Engine()
-	var session models.Session
+    _, err := database.GetSession(db, email)
 
-    result := db.Where("email = ? AND endsession > NOW()", email).Last(&session)
-    if result.Error != nil {
-        if result.Error == gorm.ErrRecordNotFound {
-            return false
-        } else {
-            log.Fatal(result.Error)
+    if err == nil {
+        ValidToken, _ := GenerateJWT(email)
+        if token == ValidToken {
+            return true
         }
-    }
-
-    ValidToken, _ := GenerateJWT(email)
-    if token == ValidToken {
-        return true
-    }
-    return false 
+    } 
+    return false
 }
