@@ -7,6 +7,7 @@ import (
     "tasks/models"
     "tasks/auth"
     "tasks/utils"
+    "tasks/database"
     "encoding/json"
 )
 
@@ -36,7 +37,6 @@ func CreateNewTask(w http.ResponseWriter, r *http.Request) {
 	}
 
     db := *utils.Engine()
-    var user models.User
     var requestData map[string]string
     emailHeader := r.Header.Get("email")
 	tokenHeader := r.Header.Get("token")
@@ -56,15 +56,8 @@ func CreateNewTask(w http.ResponseWriter, r *http.Request) {
     session := auth.IsSession(emailHeader, tokenHeader)
 
     if session == true {
-        result := db.Preload("Roles").Where("email = ?", emailHeader).First(&user)
-        if result.Error != nil {
-            log.Fatal(result.Error)
-        }
-        task, _ := user.CreateTask(taskname)
-        result = db.Create(task)
-        if result.Error != nil {
-            log.Fatal(result.Error)
-        }
+        user := database.GetUser(db, emailHeader)
+        task := database.CreateTask(db, taskname, user)
 
         w.Write([]byte("task was created with id " + strconv.Itoa(task.Id)))
     } else {
@@ -98,18 +91,7 @@ func deleteTask(w http.ResponseWriter, r *http.Request) {
     session := auth.IsSession(emailHeader, tokenHeader)
 
     if session == true {
-        result := db.Delete(&models.Task{}, id)
-
-        if result.Error != nil {
-            http.Error(w, "Database error: " + result.Error.Error(), http.StatusInternalServerError)
-            return
-        }
-
-        if result.RowsAffected == 0 {
-            http.Error(w, "No record found", http.StatusNotFound)
-            return
-        }
-
+        database.DeleteNoteByID(db, &models.Task{}, id)
         w.Write([]byte("task was delete with id " + id))
     } else {
         w.Write([]byte("session is not exist"))

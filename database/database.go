@@ -11,10 +11,10 @@ import (
 )
 
 func GetUser (db *gorm.DB, email string) (user *models.User) {
-	result := db.Where("email = ?", email).First(&user)
+	result := db.Preload("Roles").Where("email = ?", email).First(&user)
     if result.Error != nil {
         if result.Error == gorm.ErrRecordNotFound {
-            fmt.Printf("Пользователь с email %s не найден.\n", email)
+            fmt.Printf("User with email %s not found.\n", email)
         } else {
             log.Fatal(result.Error)
         }
@@ -41,4 +41,25 @@ func GetSession (db *gorm.DB, email string) (session *models.Session, err error)
         }
     }
 	return session, nil
+}
+
+func CreateTask (db *gorm.DB, taskname string, user *models.User) (task *models.Task){
+	task, _ = user.CreateTask(taskname)
+	result := db.Create(task)
+	if result.Error != nil {
+		log.Fatal(result.Error)
+	}
+	return task
+}
+
+func DeleteNoteByID (db *gorm.DB, model interface{}, id string) {
+	result := db.Delete(model, id)
+
+	if result.Error != nil {
+        if result.Error == gorm.ErrRecordNotFound {
+            fmt.Printf("Note with id %s not found.\n", id)
+        } else {
+            log.Fatal(result.Error)
+        }
+	}
 }
