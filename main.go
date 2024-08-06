@@ -1,14 +1,18 @@
 package main
 
 import (
+    //"fmt"
     "log"
     "strconv"
     "net/http"
     "tasks/models"
     "tasks/auth"
     "tasks/utils"
+    "tasks/rabbit"
     "tasks/database"
     "encoding/json"
+    // "github.com/gin-gonic/gin"
+    //"github.com/streadway/amqp"
 )
 
 func UserValidation(w http.ResponseWriter, r *http.Request) {
@@ -98,12 +102,43 @@ func deleteTask(w http.ResponseWriter, r *http.Request) {
     }
 }
 
+func IdsTask(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+    var ids []string
+    if err := json.NewDecoder(r.Body).Decode(&ids); err != nil {
+        http.Error(w, err.Error(), http.StatusBadRequest)
+        return
+    }
+    defer r.Body.Close()
+
+    message, err := json.Marshal(ids)
+    if err != nil {
+        http.Error(w, "Failed to serialize JSON", http.StatusInternalServerError)
+        return
+    }
+
+    ch, _ := rabbit.ConnectRabbitMQ()
+    err = rabbit.PublishMessage(ch, message)
+		if err != nil {
+			http.Error(w, "Couldn't send message to RabbitMQ", http.StatusInternalServerError)
+			return
+		}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(`{"message": "IDs received and sent to RabbitMQ"}`))
+}
+
 func main() {
 
 	mux := http.NewServeMux()
     mux.HandleFunc("/login", UserValidation)
     mux.HandleFunc("/task", CreateNewTask)
     mux.HandleFunc("/delete", deleteTask)
+    mux.HandleFunc("/idtasks", IdsTask)
 
 	err := http.ListenAndServe(":4000", mux)
     log.Fatal(err)
