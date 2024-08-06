@@ -10,35 +10,34 @@ func ConnectRabbitMQ() (*amqp.Channel, error) {
 	if err != nil {
 		log.Fatalf("Couldn't connect to RabbitMQ: %s", err)
 	}
-	//defer conn.Close()
 
 	ch, err := conn.Channel()
 	if err != nil {
 		log.Fatalf("Couldn't open channel: %s", err)
 	}
-	//defer ch.Close()
+
 	return ch, nil
 }
 
 func PublishMessage(ch *amqp.Channel, message []byte) error {
 	queueName := "id_task"
 	_, err := ch.QueueDeclare(
-		queueName, // имя очереди
-		false,     // durable
-		false,     // delete when unused
-		false,     // exclusive
-		false,     // no-wait
-		nil,       // arguments
+		queueName,
+		false,
+		false,
+		false,
+		false,
+		nil,
 	)
 	if err != nil {
 		log.Fatalf("The queue could not be declared: %s", err)
 	}
 
 	err = ch.Publish(
-		"",        // exchange
-		queueName, // routing key (queue name)
-		false,     // mandatory
-		false,     // immediate
+		"",
+		queueName,
+		false,
+		false,
 		amqp.Publishing{
 			ContentType: "application/json",
 			Body:        message,

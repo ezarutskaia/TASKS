@@ -122,10 +122,10 @@ func IdsTask(w http.ResponseWriter, r *http.Request) {
 
     ch, _ := rabbit.ConnectRabbitMQ()
     err = rabbit.PublishMessage(ch, message)
-		if err != nil {
-			http.Error(w, "Couldn't send message to RabbitMQ", http.StatusInternalServerError)
-			return
-		}
+    if err != nil {
+        http.Error(w, "Couldn't send message to RabbitMQ", http.StatusInternalServerError)
+        return
+    }
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

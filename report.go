@@ -3,6 +3,7 @@ package main
 import (
     "log"
     "strconv"
+    "strings"
     "tasks/utils"
     "tasks/models"
     "tasks/rabbit"
@@ -11,7 +12,7 @@ import (
 )
 
 
-func GetPdfByID() {
+func main() {
     db := *utils.Engine()
     ch, _ := rabbit.ConnectRabbitMQ()
     var tasks []models.Task
@@ -67,17 +68,11 @@ func GetPdfByID() {
             pdf.Ln(10)
         }
 
-        err = pdf.OutputFileAndClose("pdf/tasks.pdf")
+        err = pdf.OutputFileAndClose("pdf/tasks-" + strings.Join(ids, ", ") + ".pdf")
         if err != nil {
             log.Fatalf("Failed to generate PDF: %v", err)
         }
 
         log.Println("PDF successfully generated!")
     }
-}
-
-func main() {
-
-    GetPdfByID()
-
 }
